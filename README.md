@@ -39,7 +39,103 @@ El diagrama E-R establece las relaciones entre los diferentes componentes del ju
 
 ---
 
-🎯 **2.0 - Próximo paso:** Desarrollar la base de datos y conectar con el código Java. 
+
+## 📝 2.0 - BASE DE DATOS MySQL  
+
+
+La base de datos de *Ahorca/World* está diseñada para gestionar jugadores, partidas, logros y rankings de manera eficiente. A continuación, se presenta la estructura optimizada en SQL:  
+
+
+📌 Creación de la base de datos
+```
+CREATE DATABASE AhorcaWorld;
+USE AhorcaWorld;
+```
+🎮 Tabla de Jugadores
+```
+CREATE TABLE Jugador (
+    IDJugador INT PRIMARY KEY AUTO_INCREMENT,
+    Nombre VARCHAR(50) NOT NULL,
+    Contraseña VARCHAR(255) NOT NULL,
+    IDAdmin INT DEFAULT NULL
+);
+```
+🛡️ Tabla de Administradores
+```
+CREATE TABLE Admin (
+    IDAdmin INT PRIMARY KEY AUTO_INCREMENT,
+    Rango VARCHAR(20) NOT NULL,
+    IDJugador INT UNIQUE,
+    FOREIGN KEY (IDJugador) REFERENCES Jugador(IDJugador)
+);
+```
+🎲 Tabla de Partidas
+```
+CREATE TABLE Partida (
+    IDPartida INT PRIMARY KEY AUTO_INCREMENT,
+    Resultado ENUM('Ganado', 'Perdido') NOT NULL,
+    Puntuación INT NOT NULL,
+    IDJugador INT,
+    IDPalabra INT,
+    IDJuego INT,
+    FOREIGN KEY (IDJugador) REFERENCES Jugador(IDJugador),
+    FOREIGN KEY (IDPalabra) REFERENCES Palabra(IDPalabra),
+    FOREIGN KEY (IDJuego) REFERENCES ModoJuego(IDJuego)
+);
+```
+ 🏆 Tabla de Logros
+```
+CREATE TABLE Logros (
+    IDLogro INT PRIMARY KEY AUTO_INCREMENT,
+    IDJugador INT,
+    FOREIGN KEY (IDJugador) REFERENCES Jugador(IDJugador)
+);
+```
+ 📊 Tabla de Ranking
+```
+CREATE TABLE Ranking (
+    IDRanking INT PRIMARY KEY AUTO_INCREMENT,
+    Rango VARCHAR(20) NOT NULL,
+    IDPartida INT,
+    FOREIGN KEY (IDPartida) REFERENCES Partida(IDPartida)
+);
+```
+ 🔤 Tabla de Palabras
+```
+CREATE TABLE Palabra (
+    IDPalabra INT PRIMARY KEY AUTO_INCREMENT,
+    Palabra VARCHAR(50) NOT NULL,
+    Sinonimo1 VARCHAR(50),
+    Sinonimo2 VARCHAR(50),
+    IDDificultad INT,
+    FOREIGN KEY (IDDificultad) REFERENCES Dificultad(IDDificultad)
+);
+```
+🔥 Tabla de Dificultad
+```
+CREATE TABLE Dificultad (
+    IDDificultad INT PRIMARY KEY AUTO_INCREMENT,
+    Nivel VARCHAR(10) NOT NULL,
+    Recompensa INT NOT NULL
+);
+```
+ 🕹️ Tabla de Modo de Juego
+```
+CREATE TABLE ModoJuego (
+    IDJuego INT PRIMARY KEY AUTO_INCREMENT,
+    Nombre VARCHAR(50) NOT NULL,
+    IDDificultad INT,
+    FOREIGN KEY (IDDificultad) REFERENCES Dificultad(IDDificultad)
+);
+```
+✅ **Base de Datos Lista**
+
+---
+
+
+
+🎯 **Próximo paso:** Conectar la base de datos con Java mediante **JDBC**.  
+
 
 ¡Os mantendre informados! 💻🔥
 
