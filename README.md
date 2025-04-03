@@ -22,7 +22,8 @@ Bienvenidos a la presentación del desarrollo de "Ahorca/World", un juego del ah
 
 El diagrama E-R establece las relaciones entre los diferentes componentes del juego. A continuación, se explican las entidades principales:
 
-![Tablero virtual con diagrama entidad-relación](https://github.com/user-attachments/assets/b86809e1-1c79-4da6-a3ba-6c0fe013cab6)
+![Tablero virtual con diagrama entidad-relación(1)](https://github.com/user-attachments/assets/3d4d3f59-0969-4d6f-9b5c-7a37f6cae4be)
+
 
 ---
 
@@ -30,7 +31,7 @@ El diagrama E-R establece las relaciones entre los diferentes componentes del ju
 |--------------|----------------------------------------------|------------------------------------------------------------------------|
 | **Jugador (JUGADOR)** | Nombre 📝,  Contraseña 🔑,  IDJugador 🆔,  IDAdmin 🛡️ (opcional) | Puede jugar varias partidas 🎲, obtener logros 🏆, aparecer en el ranking 📊 |
 | **Administrador (ADMIN)** | IDAdmin 🆔, Rango ⭐, IDJugador 🆔 | Solo los jugadores con la contraseña de admin pueden acceder al rango |
-| **Partida (PARTIDA)** | IDPartida 🆔, Resultado ✅❌, Puntuación 🎯, IDJugador 🆔, IDPalabra 🔤, IDJuego 🕹️ | Cada jugador puede participar en múltiples partidas; cada partida tiene una palabra asociada |
+| **Partida (PARTIDA)** | IDPartida 🆔, Resultado ✅❌, Puntuación 🎯, IDJugador 🆔, IDPalabra 🔤, IDJuego 🕹️ , IDnumJuego| Cada jugador puede participar en múltiples partidas; cada partida tiene una palabra asociada |
 | **Logros (LOGROS)** | IDLogro 🆔, IDJugador 🆔 | Cada jugador puede desbloquear varios logros |
 | **Ranking (RANKING)** | IDRanking 🆔, Rango 🏅, IDPartida 🆔 | Cada partida tiene una puntuación que influye en el ranking |
 | **Palabra (PALABRA)** | IDPalabra 🆔, Sinónimo 1 📝, Sinónimo 2 📝, IDDificultad 🔥 | Cada palabra tiene una dificultad asignada |
@@ -78,6 +79,7 @@ CREATE TABLE Partida (
     IDJugador INT,
     IDPalabra INT,
     IDJuego INT,
+    IDnumJuego INT,
     FOREIGN KEY (IDJugador) REFERENCES Jugador(IDJugador),
     FOREIGN KEY (IDPalabra) REFERENCES Palabra(IDPalabra),
     FOREIGN KEY (IDJuego) REFERENCES ModoJuego(IDJuego)
