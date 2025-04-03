@@ -136,7 +136,7 @@ CREATE TABLE ModoJuego (
 
 
 
-🎯 **Próximo paso:** Conectar la base de datos con Java mediante **JDBC**.  
+🎯 **Próximo paso:** Conectar la base de datos con Java. 
 
 
 ¡Os mantendre informados! 💻🔥
