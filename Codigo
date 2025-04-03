@@ -1,0 +1,161 @@
+import javax.swing.*;
+import java.awt.*;
+
+public class Ahorcado {
+    private JFrame frame;
+    private JPanel cardPanel; // Panel que cambiará de contenido
+    private CardLayout cardLayout; // Layout para cambiar de paneles
+
+    public Ahorcado() {
+        // Crear el JFrame que ocupará toda la pantalla
+        frame = new JFrame("Juego del Ahorcado");
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        cardLayout = new CardLayout();
+        cardPanel = new JPanel(cardLayout);
+
+        // Crear las diferentes pantallas (paneles)
+        JPanel menuPanel = crearMenuPanel();
+        JPanel instruccionesPanel = crearInstruccionesPanel();
+        JPanel juegoPanel = crearJuegoPanel();
+
+        // Añadir los paneles al cardPanel
+        cardPanel.add(menuPanel, "Menu");
+        cardPanel.add(instruccionesPanel, "Instrucciones");
+        cardPanel.add(juegoPanel, "Juego");
+
+        // Establecer el panel de cambio como contenido principal del JFrame
+        frame.setContentPane(cardPanel);
+
+        // Hacer visible la ventana
+        frame.setVisible(true);
+    }
+
+    private JPanel crearMenuPanel() {
+        // Crear el panel de menú
+        JPanel menuPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+
+                // Cargar la imagen de fondo
+                ImageIcon fondoIcono = null;
+                try {
+                    fondoIcono = new ImageIcon(getClass().getResource("/fondo.png")); // Ruta relativa
+                } catch (Exception e) {
+                    System.err.println("Error: No se pudo cargar la imagen de fondo.");
+                    e.printStackTrace();
+                }
+
+                if (fondoIcono != null) {
+                    Image fondoImagen = fondoIcono.getImage();
+                    g.drawImage(fondoImagen, 0, 0, getWidth(), getHeight(), this);
+                } else {
+                    g.setColor(Color.RED);
+                    g.drawString("No se pudo cargar la imagen de fondo.", 10, 20);
+                }
+            }
+        };
+        menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS)); // Apilar los componentes
+        menuPanel.setOpaque(false); // Hacer el panel transparente para que la imagen se vea
+
+        // Crear un contenedor centralizado para los botones
+        JPanel botonesPanel = new JPanel();
+        botonesPanel.setLayout(new GridBagLayout()); // Usar GridBagLayout para alinear
+        botonesPanel.setOpaque(false); // Hacer transparente el fondo
+
+        // Crear botones y añadirlos al panel centralizado
+        JButton btnJugar = crearBoton("Jugar");
+        btnJugar.addActionListener(e -> cardLayout.show(cardPanel, "Juego"));
+        JButton btnInstrucciones = crearBoton("Instrucciones");
+        btnInstrucciones.addActionListener(e -> cardLayout.show(cardPanel, "Instrucciones"));
+        JButton btnSalir = crearBoton("Salir");
+        btnSalir.addActionListener(e -> System.exit(0));
+
+        // Añadir botones al panel con GridBagLayout
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(10, 10, 10, 10); // Espaciado entre botones
+        botonesPanel.add(btnJugar, gbc);
+        botonesPanel.add(btnInstrucciones, gbc);
+        botonesPanel.add(btnSalir, gbc);
+
+        // Añadir el panel de botones al panel principal
+        menuPanel.add(botonesPanel);
+
+        return menuPanel;
+    }
+
+    private JPanel crearInstruccionesPanel() {
+        // Crear el panel de instrucciones
+        JPanel instruccionesPanel = new JPanel();
+        instruccionesPanel.setLayout(new BoxLayout(instruccionesPanel, BoxLayout.Y_AXIS)); // Apilar los componentes
+        instruccionesPanel.setBackground(new Color(88, 214, 141)); // Color verde estilo planta
+
+        // Título de las instrucciones
+        JLabel tituloInstrucciones = new JLabel("Instrucciones del Juego");
+        tituloInstrucciones.setForeground(Color.WHITE);
+        tituloInstrucciones.setFont(new Font("Arial", Font.BOLD, 24)); // Título grande y destacado
+        tituloInstrucciones.setAlignmentX(Component.CENTER_ALIGNMENT); // Centrar título
+        instruccionesPanel.add(tituloInstrucciones);
+
+        // Espacio entre el título y las instrucciones
+        instruccionesPanel.add(Box.createVerticalStrut(20));
+
+        // Texto de instrucciones
+        JLabel instruccionesLabel = new JLabel("<html><div style='text-align: center;'>"
+                + "¡Bienvenido al Juego del Ahorcado!<br>"
+                + "Adivina la palabra antes de que el ahorcado se complete.<br>"
+                + "¡Buena suerte!</div></html>");
+        instruccionesLabel.setForeground(Color.BLACK);
+        instruccionesLabel.setFont(new Font("Arial", Font.PLAIN, 18));
+        instruccionesLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        instruccionesPanel.add(instruccionesLabel);
+
+        // Botón de volver al menú
+        JButton btnVolverMenu = crearBoton("Volver al Menú");
+        btnVolverMenu.addActionListener(e -> cardLayout.show(cardPanel, "Menu"));
+        instruccionesPanel.add(btnVolverMenu);
+
+        return instruccionesPanel;
+    }
+
+    private JPanel crearJuegoPanel() {
+        // Crear el panel del juego
+        JPanel juegoPanel = new JPanel();
+        juegoPanel.setLayout(new BoxLayout(juegoPanel, BoxLayout.Y_AXIS)); // Apilar los componentes
+        juegoPanel.setBackground(Color.BLACK);
+
+        JLabel juegoLabel = new JLabel("Aquí irá el juego del Ahorcado.");
+        juegoLabel.setForeground(Color.WHITE);
+        juegoLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        juegoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        juegoPanel.add(juegoLabel);
+
+        // Botón de volver al menú
+        JButton btnVolverMenu = crearBoton("Volver al Menú");
+        btnVolverMenu.addActionListener(e -> cardLayout.show(cardPanel, "Menu"));
+        juegoPanel.add(btnVolverMenu);
+
+        return juegoPanel;
+    }
+
+    private JButton crearBoton(String texto) {
+        JButton boton = new JButton(texto);
+        boton.setPreferredSize(new Dimension(250, 50));
+        boton.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Estilo de los botones
+        boton.setBackground(new Color(34, 139, 34));
+        boton.setForeground(Color.WHITE);
+        boton.setFont(new Font("Arial", Font.BOLD, 18));
+        boton.setFocusPainted(false);
+
+        return boton;
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(Ahorcado::new);
+    }
+}
