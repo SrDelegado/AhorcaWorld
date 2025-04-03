@@ -39,7 +39,7 @@ El diagrama E-R establece las relaciones entre los diferentes componentes del ju
 
 ---
 
-🎯 ** 2.0 - Próximo paso:** Desarrollar la base de datos y conectar con el código Java. 
+🎯 **2.0 - Próximo paso:** Desarrollar la base de datos y conectar con el código Java. 
 
 ¡Os mantendre informados! 💻🔥
 
