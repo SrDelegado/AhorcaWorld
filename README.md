@@ -23,7 +23,8 @@ Bienvenidos a la presentación del desarrollo de "Ahorca/World", un juego del ah
 El diagrama E-R establece las relaciones entre los diferentes componentes del juego. A continuación, se explican las entidades principales:
 
 ![Tablero virtual con diagrama entidad-relación(1)](https://github.com/user-attachments/assets/3d4d3f59-0969-4d6f-9b5c-7a37f6cae4be)
-![Uploading White Colorful Concept Map Chart.png…]()
+![White Colorful Concept Map Chart](https://github.com/user-attachments/assets/d3a44134-e656-410f-9c0e-5fb673be0640)
+
 
 
 ---
