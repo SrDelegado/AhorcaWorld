@@ -1,161 +1,171 @@
-import javax.swing.*;
 import java.awt.*;
+import java.io.*;
+import javax.swing.*;
 
-public class Ahorcado {
-    private JFrame frame;
-    private JPanel cardPanel; // Panel que cambiará de contenido
-    private CardLayout cardLayout; // Layout para cambiar de paneles
+public class AhorcaWorld {
+    private static final String USER_FILE = "/home/nicmau/Escriptori/Maurons/Ahorcado/usuarios.txt";
 
-    public Ahorcado() {
-        // Crear el JFrame que ocupará toda la pantalla
-        frame = new JFrame("Juego del Ahorcado");
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        cardLayout = new CardLayout();
-        cardPanel = new JPanel(cardLayout);
-
-        // Crear las diferentes pantallas (paneles)
-        JPanel menuPanel = crearMenuPanel();
-        JPanel instruccionesPanel = crearInstruccionesPanel();
-        JPanel juegoPanel = crearJuegoPanel();
-
-        // Añadir los paneles al cardPanel
-        cardPanel.add(menuPanel, "Menu");
-        cardPanel.add(instruccionesPanel, "Instrucciones");
-        cardPanel.add(juegoPanel, "Juego");
-
-        // Establecer el panel de cambio como contenido principal del JFrame
-        frame.setContentPane(cardPanel);
-
-        // Hacer visible la ventana
-        frame.setVisible(true);
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(AhorcaWorld::showLoginScreen);
     }
 
-    private JPanel crearMenuPanel() {
-        // Crear el panel de menú
-        JPanel menuPanel = new JPanel() {
+    private static void showLoginScreen() {
+        JFrame loginFrame = new JFrame("");
+        loginFrame.setUndecorated(true);
+        loginFrame.setResizable(false);
+        loginFrame.setSize(400, 300);
+        loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        loginFrame.setLocationRelativeTo(null);
+        loginFrame.setLayout(null);
+
+        JButton closeButton2 = new JButton("X");
+        closeButton2.setFont(new Font("SansSerif", Font.BOLD, 10));
+        closeButton2.setForeground(Color.WHITE);
+        closeButton2.setBackground(Color.RED);
+        closeButton2.setFocusPainted(false);
+        closeButton2.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        closeButton2.addActionListener(e -> System.exit(0));
+         
+    
+        // Establecer la posición del botón (por ejemplo, en la esquina superior derecha)
+        closeButton2.setBounds(360, 10, 28, 25);
+        loginFrame.add(closeButton2);
+
+
+        
+        
+        Font modernFont = new Font("SansSerif", Font.PLAIN, 16);
+
+        
+        
+        JLabel userLabel = new JLabel("Usuario:");
+        userLabel.setFont(modernFont);
+        userLabel.setBounds(50, 50, 100, 30);
+        JTextField userField = new JTextField();
+        userField.setFont(modernFont);
+        userField.setBounds(150, 50, 200, 30);
+        
+        JLabel passLabel = new JLabel("Contraseña:");
+        passLabel.setFont(modernFont);
+        passLabel.setBounds(50, 100, 100, 30);
+        JPasswordField passField = new JPasswordField();
+        passField.setFont(modernFont);
+        passField.setBounds(150, 100, 200, 30);
+        
+        JButton loginButton = new JButton("Iniciar Sesión");
+        loginButton.setFont(modernFont);
+        loginButton.setBounds(50, 160, 140, 40);
+        loginButton.setBackground(Color.DARK_GRAY);
+        loginButton.setForeground(Color.WHITE);
+        loginButton.setFocusPainted(false);
+
+        JButton registerButton = new JButton("Registrarse");
+        registerButton.setFont(modernFont);
+        registerButton.setBounds(210, 160, 140, 40);
+        registerButton.setBackground(Color.DARK_GRAY);
+        registerButton.setForeground(Color.WHITE);
+        registerButton.setFocusPainted(false);
+        
+        loginButton.addActionListener(e -> {
+            if (authenticateUser(userField.getText(), new String(passField.getPassword()))) {
+                loginFrame.dispose();
+                showGameWindow();
+            } else {
+                JOptionPane.showMessageDialog(loginFrame, "Usuario o contraseña incorrectos.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        
+        registerButton.addActionListener(e -> registerUser(userField, passField, registerButton, loginButton));
+
+        loginFrame.add(userLabel);
+        loginFrame.add(userField);
+        loginFrame.add(passLabel);
+        loginFrame.add(passField);
+        loginFrame.add(loginButton);
+        loginFrame.add(registerButton);
+
+        loginFrame.setVisible(true);
+
+      
+    }
+
+    private static boolean authenticateUser(String username, String password) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(USER_FILE))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 2 && parts[0].equals(username) && parts[1].equals(password)) {
+                    return true;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private static void registerUser(JTextField userField, JPasswordField passField, JButton registerButton, JButton loginButton) {
+        if (userField.getText().isEmpty() || new String(passField.getPassword()).isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Usuario y contraseña no pueden estar vacíos.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(USER_FILE, true))) {
+            // Registrar usuario en el archivo
+            writer.write(userField.getText() + "," + new String(passField.getPassword()));
+            writer.newLine();
+            JOptionPane.showMessageDialog(null, "Usuario registrado con éxito.", "Registro Exitoso", JOptionPane.INFORMATION_MESSAGE);
+
+            // Deshabilitar campos y botones después del registro
+            userField.setEditable(false);
+            passField.setEditable(false);
+            registerButton.setEnabled(false);
+            loginButton.setEnabled(false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }    
+    
+}
+
+    private static void showGameWindow() {
+        JFrame frame = new JFrame("Juego del Ahorcado");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setUndecorated(true);
+
+        
+
+        JPanel panel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-
-                // Cargar la imagen de fondo
-                ImageIcon fondoIcono = null;
-                try {
-                    fondoIcono = new ImageIcon(getClass().getResource("/fondo.png")); // Ruta relativa
-                } catch (Exception e) {
-                    System.err.println("Error: No se pudo cargar la imagen de fondo.");
-                    e.printStackTrace();
-                }
-
-                if (fondoIcono != null) {
-                    Image fondoImagen = fondoIcono.getImage();
-                    g.drawImage(fondoImagen, 0, 0, getWidth(), getHeight(), this);
-                } else {
-                    g.setColor(Color.RED);
-                    g.drawString("No se pudo cargar la imagen de fondo.", 10, 20);
-                }
+                ImageIcon background = new ImageIcon("/home/nicmau/Escriptori/Maurons/Ahorcado/fondo.png");
+                g.drawImage(background.getImage(), 0, 0, getWidth(), getHeight(), this);
             }
         };
-        menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS)); // Apilar los componentes
-        menuPanel.setOpaque(false); // Hacer el panel transparente para que la imagen se vea
+        panel.setLayout(new BorderLayout());
 
-        // Crear un contenedor centralizado para los botones
-        JPanel botonesPanel = new JPanel();
-        botonesPanel.setLayout(new GridBagLayout()); // Usar GridBagLayout para alinear
-        botonesPanel.setOpaque(false); // Hacer transparente el fondo
+        JButton closeButton = new JButton("X");
+        closeButton.setFont(new Font("SansSerif", Font.BOLD, 20));
+        closeButton.setForeground(Color.WHITE);
+        closeButton.setBackground(Color.RED);
+        closeButton.setFocusPainted(false);
+        closeButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        closeButton.addActionListener(e -> System.exit(0));
 
-        // Crear botones y añadirlos al panel centralizado
-        JButton btnJugar = crearBoton("Jugar");
-        btnJugar.addActionListener(e -> cardLayout.show(cardPanel, "Juego"));
-        JButton btnInstrucciones = crearBoton("Instrucciones");
-        btnInstrucciones.addActionListener(e -> cardLayout.show(cardPanel, "Instrucciones"));
-        JButton btnSalir = crearBoton("Salir");
-        btnSalir.addActionListener(e -> System.exit(0));
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        topPanel.setOpaque(false);
+        topPanel.add(closeButton);
 
-        // Añadir botones al panel con GridBagLayout
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(10, 10, 10, 10); // Espaciado entre botones
-        botonesPanel.add(btnJugar, gbc);
-        botonesPanel.add(btnInstrucciones, gbc);
-        botonesPanel.add(btnSalir, gbc);
+        panel.add(topPanel, BorderLayout.NORTH);
 
-        // Añadir el panel de botones al panel principal
-        menuPanel.add(botonesPanel);
+        frame.setContentPane(panel);
+        frame.setVisible(true);
 
-        return menuPanel;
-    }
+    
 
-    private JPanel crearInstruccionesPanel() {
-        // Crear el panel de instrucciones
-        JPanel instruccionesPanel = new JPanel();
-        instruccionesPanel.setLayout(new BoxLayout(instruccionesPanel, BoxLayout.Y_AXIS)); // Apilar los componentes
-        instruccionesPanel.setBackground(new Color(88, 214, 141)); // Color verde estilo planta
+    
 
-        // Título de las instrucciones
-        JLabel tituloInstrucciones = new JLabel("Instrucciones del Juego");
-        tituloInstrucciones.setForeground(Color.WHITE);
-        tituloInstrucciones.setFont(new Font("Arial", Font.BOLD, 24)); // Título grande y destacado
-        tituloInstrucciones.setAlignmentX(Component.CENTER_ALIGNMENT); // Centrar título
-        instruccionesPanel.add(tituloInstrucciones);
 
-        // Espacio entre el título y las instrucciones
-        instruccionesPanel.add(Box.createVerticalStrut(20));
-
-        // Texto de instrucciones
-        JLabel instruccionesLabel = new JLabel("<html><div style='text-align: center;'>"
-                + "¡Bienvenido al Juego del Ahorcado!<br>"
-                + "Adivina la palabra antes de que el ahorcado se complete.<br>"
-                + "¡Buena suerte!</div></html>");
-        instruccionesLabel.setForeground(Color.BLACK);
-        instruccionesLabel.setFont(new Font("Arial", Font.PLAIN, 18));
-        instruccionesLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        instruccionesPanel.add(instruccionesLabel);
-
-        // Botón de volver al menú
-        JButton btnVolverMenu = crearBoton("Volver al Menú");
-        btnVolverMenu.addActionListener(e -> cardLayout.show(cardPanel, "Menu"));
-        instruccionesPanel.add(btnVolverMenu);
-
-        return instruccionesPanel;
-    }
-
-    private JPanel crearJuegoPanel() {
-        // Crear el panel del juego
-        JPanel juegoPanel = new JPanel();
-        juegoPanel.setLayout(new BoxLayout(juegoPanel, BoxLayout.Y_AXIS)); // Apilar los componentes
-        juegoPanel.setBackground(Color.BLACK);
-
-        JLabel juegoLabel = new JLabel("Aquí irá el juego del Ahorcado.");
-        juegoLabel.setForeground(Color.WHITE);
-        juegoLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        juegoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        juegoPanel.add(juegoLabel);
-
-        // Botón de volver al menú
-        JButton btnVolverMenu = crearBoton("Volver al Menú");
-        btnVolverMenu.addActionListener(e -> cardLayout.show(cardPanel, "Menu"));
-        juegoPanel.add(btnVolverMenu);
-
-        return juegoPanel;
-    }
-
-    private JButton crearBoton(String texto) {
-        JButton boton = new JButton(texto);
-        boton.setPreferredSize(new Dimension(250, 50));
-        boton.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // Estilo de los botones
-        boton.setBackground(new Color(34, 139, 34));
-        boton.setForeground(Color.WHITE);
-        boton.setFont(new Font("Arial", Font.BOLD, 18));
-        boton.setFocusPainted(false);
-
-        return boton;
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(Ahorcado::new);
     }
 }
