@@ -136,9 +136,26 @@ CREATE TABLE ModoJuego (
 
 ---
 
+#  3.0 Conectar la base de datos con Java. 
+
+El juego tiene ACTUALMENTE las siguientes características:
+
+- **Palabra aleatoria:** La palabra a adivinar se selecciona aleatoriamente 
+- **Interfaz gráfica:** Utiliza `JFrame` y `JPanel` para mostrar diferentes componentes como etiquetas (`JLabel`), campos de texto (`JTextField`), y botones (`JButton`).
+- **Imagen dinámica del ahorcado:** El muñeco ahorcado cambia con cada intento fallido, a sido creado y diseñado por mi mismo.
+- **Ingreso de letras:** El jugador puede ingresar letras para intentar adivinar la palabra.
+- **Letras usadas:** Se muestran las letras que el jugador ya ha intentado.
+  
+
+![image](https://github.com/user-attachments/assets/862f6a6c-45aa-4da0-b6e4-c362cf6f7d6e)
+
+![image](https://github.com/user-attachments/assets/58807f93-5df1-4869-b6ac-e48d2645ef39)
 
 
-🎯 **Próximo paso:** Conectar la base de datos con Java. 
+
+
+
+🎯 **Próximo paso:** Crear el resto de niveles. 
 
 
 ¡Os mantendre informados! 💻🔥
