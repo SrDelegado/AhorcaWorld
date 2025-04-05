@@ -1,0 +1,236 @@
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import java.io.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Random;
+
+public class JuegoAhorcadoFACIL {
+    private static final String PALABRAS_FILE = "palabras.txt"; // Archivo de palabras
+    private static final int MAX_INTENTOS = 6; // Número máximo de intentos
+
+    private String palabra;
+    private Set<Character> letrasAdivinadas;
+    private int intentos;
+    private JLabel palabraLabel;
+    private JLabel ahorcadoLabel;
+    private JLabel letrasUsadasLabel;
+    private JTextField inputField;
+
+    public JuegoAhorcadoFACIL() {
+        // Inicializamos el juego
+        letrasAdivinadas = new HashSet<>();
+        intentos = 0;
+        palabra = getRandomWord(); // Obtenemos una palabra aleatoria desde el archivo
+        
+        // Crear la ventana del juego
+        JFrame gameFrame = new JFrame("Juego del Ahorcado");
+        gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        gameFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        gameFrame.setUndecorated(true);
+
+// Panel para la palabra
+JPanel palabraPanel = new JPanel();
+palabraPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 140));  // Alineación centrada con márgenes
+palabraLabel = new JLabel(getCurrentWordState());
+palabraLabel.setFont(new Font("Monospaced", Font.PLAIN, 44));
+
+// Añadir la etiqueta al panel
+palabraPanel.add(palabraLabel);
+
+// Agregar el panel a la ventana (en este caso, lo alineará según el FlowLayout)
+gameFrame.add(palabraPanel, BorderLayout.CENTER);  // Esto lo coloca en el centro del panel principal
+
+        // Panel para los intentos y el muñeco ahorcado
+        JPanel ahorcadoPanel = new JPanel();
+        ahorcadoPanel.setLayout(new FlowLayout());
+        
+        ahorcadoLabel = new JLabel();
+        ahorcadoLabel.setFont(new Font("Monospaced", Font.PLAIN, 24));
+        ahorcadoPanel.add(ahorcadoLabel);
+        ahorcadoPanel.setLayout(null);  
+        ahorcadoLabel.setBounds(340, 100, 450, 400); 
+
+        // Panel para las letras usadas
+        JPanel letrasUsadasPanel = new JPanel();
+        letrasUsadasPanel.setLayout(new FlowLayout(FlowLayout.LEFT));  // Alineación a la izquierda
+        letrasUsadasLabel = new JLabel("Letras usadas: ");
+        letrasUsadasLabel.setFont(new Font("Monospaced", Font.PLAIN, 18));
+        letrasUsadasLabel.setPreferredSize(new Dimension(400, 30));  // Tamaño fijo para la etiqueta
+                letrasUsadasPanel.setLayout(null);  
+        letrasUsadasLabel.setBounds(10, 10, 400, 400); 
+        letrasUsadasPanel.add(letrasUsadasLabel);
+        
+        // Configurar el panel para que no afecte la estructura
+        letrasUsadasPanel.setPreferredSize(new Dimension(400, 40));  // Tamaño fijo para el panel
+        letrasUsadasPanel.setMaximumSize(new Dimension(400, 40));  // Limitar el tamaño máximo
+        letrasUsadasPanel.setMinimumSize(new Dimension(400, 40));  // Limitar el tamaño mínimo
+        
+
+
+    // Panel de entrada para la letra
+JPanel inputPanel = new JPanel();
+inputPanel.setLayout(new FlowLayout(FlowLayout.CENTER));  // Centrar los componentes dentro del panel
+inputPanel.setPreferredSize(new Dimension(400, 60));  // Ajustar el tamaño del panel para mayor claridad
+
+      // Botón "Volver al Menú"
+JButton volverButton = new JButton("Volver al Menú");
+volverButton.setFont(new Font("Monospaced", Font.BOLD, 16));
+volverButton.setBackground(Color.RED);
+volverButton.setForeground(Color.WHITE);
+
+
+volverButton.addActionListener(e -> {
+    JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(volverButton);
+    topFrame.dispose(); // Cerrar la ventana actual
+    AhorcaWorld.showGameWindow(); // Volver al menú principal
+});
+
+inputPanel.add(volverButton);
+
+// Campo de texto para la letra
+inputField = new JTextField(4);
+inputField.setFont(new Font("Monospaced", Font.PLAIN, 18));  // Establecer la fuente para el campo de texto
+inputField.setHorizontalAlignment(JTextField.CENTER);  // Centrar el texto dentro del campo
+inputField.setPreferredSize(new Dimension(180, 40));  // Ajustar tamaño del campo de texto
+
+// Botón de intentar
+JButton submitButton = new JButton("Intentar");
+submitButton.setFont(new Font("Monospaced", Font.BOLD, 16));  // Estilo para el botón
+submitButton.setBackground(new Color(60, 179, 113));  // Color de fondo
+submitButton.setForeground(Color.WHITE);  // Color del texto
+submitButton.setPreferredSize(new Dimension(120, 40));  // Ajustar tamaño del botón
+
+// Añadir la acción al botón
+submitButton.addActionListener(e -> procesarIntento());
+
+// Añadir el campo de texto y el botón al panel
+inputPanel.add(inputField);
+inputPanel.add(submitButton);
+
+
+        // Agregar los paneles a la ventana
+        gameFrame.add(palabraPanel, BorderLayout.NORTH);
+        gameFrame.add(ahorcadoPanel, BorderLayout.CENTER);
+        gameFrame.add(letrasUsadasPanel, BorderLayout.WEST);
+        gameFrame.add(inputPanel, BorderLayout.SOUTH);
+
+        // Mostrar la imagen inicial del ahorcado
+        actualizarImagenAhorcado();
+
+        gameFrame.setVisible(true);
+    }
+
+    private String getRandomWord() {
+        File file = new File(PALABRAS_FILE);
+        
+        // Verificar si el archivo existe
+        if (!file.exists()) {
+            JOptionPane.showMessageDialog(null, "El archivo de palabras no existe en la ruta especificada.");
+            return "error";  // Si el archivo no existe, devolvemos "error"
+        }
+    
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            List<String> palabras = new ArrayList<>();
+            String line;
+            
+            // Leer todas las líneas del archivo
+            while ((line = reader.readLine()) != null) {
+                palabras.add(line.trim());
+            }
+            
+            // Verificar si se cargaron palabras
+            if (palabras.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "El archivo está vacío.");
+                return "error";  // Devolver "error" si no se cargaron palabras
+            }
+            
+            // Seleccionar una palabra aleatoria
+            return palabras.get(new Random().nextInt(palabras.size()));
+            
+        } catch (IOException e) {
+            // Capturar excepciones al intentar leer el archivo
+            JOptionPane.showMessageDialog(null, "Error al leer el archivo de palabras: " + e.getMessage());
+            return "error";  // Devolver "error" si hay un problema leyendo el archivo
+        }
+    }
+    
+
+    // Procesar el intento del usuario
+    private void procesarIntento() {
+        String input = inputField.getText().toLowerCase();
+        inputField.setText("");
+
+        if (input.isEmpty() || input.length() > 1 || !Character.isLetter(input.charAt(0))) {
+            JOptionPane.showMessageDialog(null, "Por favor, ingresa una letra válida.");
+            return;
+        }
+
+        char letra = input.charAt(0);
+        if (letrasAdivinadas.contains(letra)) {
+            JOptionPane.showMessageDialog(null, "Ya has intentado esta letra.");
+            return;
+        }
+
+        letrasAdivinadas.add(letra);
+        if (!palabra.contains(String.valueOf(letra))) {
+            intentos++;
+        }
+
+        actualizarEstadoJuego();
+    }
+
+    private void actualizarEstadoJuego() {
+        palabraLabel.setText(getCurrentWordState());
+        actualizarImagenAhorcado();
+        letrasUsadasLabel.setText("Letras usadas: " + letrasAdivinadas);
+
+        if (getCurrentWordState().replace(" ", "").equals(palabra)) {
+            JOptionPane.showMessageDialog(null, "¡Felicidades! Has adivinado la palabra.");
+        } else if (intentos >= MAX_INTENTOS) {
+            JOptionPane.showMessageDialog(null, "¡Has perdido! La palabra era: " + palabra);
+        }
+    }
+
+    // Mostrar el estado actual de la palabra (letras adivinadas y huecos)
+    private String getCurrentWordState() {
+        StringBuilder currentState = new StringBuilder();
+        for (char c : palabra.toCharArray()) {
+            if (letrasAdivinadas.contains(c)) {
+                currentState.append(c).append(" ");
+            } else {
+                currentState.append("_ ");
+            }
+        }
+        return currentState.toString().trim();
+    }
+
+   // Mostrar el estado actual del muñeco ahorcado
+private void actualizarImagenAhorcado() {
+    String imagePath = "C:\\Users\\usuario\\Desktop\\Escuela\\Programacion\\Proyecto\\" + intentos + ".png";
+    try {
+        // Cargar la imagen
+        ImageIcon icon = new ImageIcon(imagePath);
+        
+        // Redimensionar la imagen (por ejemplo, 200x200 píxeles)
+        Image image = icon.getImage().getScaledInstance(450, 400, Image.SCALE_DEFAULT);
+        
+        // Crear un nuevo ImageIcon con la imagen redimensionada
+        icon = new ImageIcon(image);
+        
+        // Asignar el icono al JLabel
+        ahorcadoLabel.setIcon(icon);
+    } catch (Exception e) {
+        System.out.println("Error al cargar la imagen: " + e.getMessage());
+        JOptionPane.showMessageDialog(null, "No se pudo cargar la imagen del ahorcado.");
+    }
+}
+
+
+    public static void main(String[] args) {
+        new JuegoAhorcadoFACIL();
+    }
+}
