@@ -1,9 +1,12 @@
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import java.io.*;
 import javax.swing.*;
+import java.util.*;
 
 public class AhorcaWorld {
-    private static final String USER_FILE = "/home/nicmau/Escriptori/Maurons/Ahorcado/usuarios.txt";
+    private static final String USER_FILE = "usuarios.txt";
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(AhorcaWorld::showLoginScreen);
@@ -25,56 +28,55 @@ public class AhorcaWorld {
         closeButton2.setFocusPainted(false);
         closeButton2.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         closeButton2.addActionListener(e -> System.exit(0));
-         
-    
+
         // Establecer la posición del botón (por ejemplo, en la esquina superior derecha)
+
         closeButton2.setBounds(360, 10, 28, 25);
         loginFrame.add(closeButton2);
 
+        Font modernFont = new Font("Monospaced", Font.BOLD, 14);
+        Color naranjaOscuro = Color.decode("#feac9c");
 
-        
-        
-        Font modernFont = new Font("SansSerif", Font.PLAIN, 16);
 
-        
-        
         JLabel userLabel = new JLabel("Usuario:");
         userLabel.setFont(modernFont);
-        userLabel.setBounds(50, 50, 100, 30);
+        userLabel.setBounds(35, 50, 100, 30);
         JTextField userField = new JTextField();
         userField.setFont(modernFont);
         userField.setBounds(150, 50, 200, 30);
-        
+
         JLabel passLabel = new JLabel("Contraseña:");
         passLabel.setFont(modernFont);
-        passLabel.setBounds(50, 100, 100, 30);
+        passLabel.setBounds(35, 100, 200, 30);
         JPasswordField passField = new JPasswordField();
         passField.setFont(modernFont);
         passField.setBounds(150, 100, 200, 30);
         
-        JButton loginButton = new JButton("Iniciar Sesión");
+
+        JButton loginButton = new JButton("Iniciar");
         loginButton.setFont(modernFont);
-        loginButton.setBounds(50, 160, 140, 40);
-        loginButton.setBackground(Color.DARK_GRAY);
-        loginButton.setForeground(Color.WHITE);
+        loginButton.setBounds(50, 190, 140, 40);
+        loginButton.setBackground(naranjaOscuro);
+        loginButton.setForeground(Color.black);
         loginButton.setFocusPainted(false);
 
         JButton registerButton = new JButton("Registrarse");
         registerButton.setFont(modernFont);
-        registerButton.setBounds(210, 160, 140, 40);
-        registerButton.setBackground(Color.DARK_GRAY);
-        registerButton.setForeground(Color.WHITE);
+        registerButton.setBounds(210, 190, 140, 40);
+        registerButton.setBackground(naranjaOscuro);
+        registerButton.setForeground(Color.black);
         registerButton.setFocusPainted(false);
-        
+
         loginButton.addActionListener(e -> {
             if (authenticateUser(userField.getText(), new String(passField.getPassword()))) {
                 loginFrame.dispose();
                 showGameWindow();
             } else {
-                JOptionPane.showMessageDialog(loginFrame, "Usuario o contraseña incorrectos.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(loginFrame, "Usuario o contraseña incorrectos.", "Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
         });
-        
+
         registerButton.addActionListener(e -> registerUser(userField, passField, registerButton, loginButton));
 
         loginFrame.add(userLabel);
@@ -86,7 +88,6 @@ public class AhorcaWorld {
 
         loginFrame.setVisible(true);
 
-      
     }
 
     private static boolean authenticateUser(String username, String password) {
@@ -104,17 +105,20 @@ public class AhorcaWorld {
         return false;
     }
 
-    private static void registerUser(JTextField userField, JPasswordField passField, JButton registerButton, JButton loginButton) {
+    private static void registerUser(JTextField userField, JPasswordField passField, JButton registerButton,
+            JButton loginButton) {
         if (userField.getText().isEmpty() || new String(passField.getPassword()).isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Usuario y contraseña no pueden estar vacíos.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Usuario y contraseña no pueden estar vacíos.", "Error",
+                    JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(USER_FILE, true))) {
             // Registrar usuario en el archivo
             writer.write(userField.getText() + "," + new String(passField.getPassword()));
             writer.newLine();
-            JOptionPane.showMessageDialog(null, "Usuario registrado con éxito.", "Registro Exitoso", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Usuario registrado con éxito.", "Registro Exitoso",
+                    JOptionPane.INFORMATION_MESSAGE);
 
             // Deshabilitar campos y botones después del registro
             userField.setEditable(false);
@@ -123,49 +127,73 @@ public class AhorcaWorld {
             loginButton.setEnabled(false);
         } catch (IOException e) {
             e.printStackTrace();
-        }    
-    
-}
+        }
 
-    private static void showGameWindow() {
+    }
+
+    public static void showGameWindow() {
         JFrame frame = new JFrame("Juego del Ahorcado");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setUndecorated(true);
-
-        
-
+    
+        Font modernFont = new Font("SansSerif", Font.PLAIN, 16);
+    
         JPanel panel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                ImageIcon background = new ImageIcon("/home/nicmau/Escriptori/Maurons/Ahorcado/fondo.png");
+                ImageIcon background = new ImageIcon("fondo.png");
                 g.drawImage(background.getImage(), 0, 0, getWidth(), getHeight(), this);
             }
         };
-        panel.setLayout(new BorderLayout());
-
+    
+        // Establecer diseño absoluto
+        panel.setLayout(null);
+    
+        Color naranjaOscuro = Color.decode("#feac9c");
+    
+        // Botón de cerrar
         JButton closeButton = new JButton("X");
         closeButton.setFont(new Font("SansSerif", Font.BOLD, 20));
         closeButton.setForeground(Color.WHITE);
         closeButton.setBackground(Color.RED);
         closeButton.setFocusPainted(false);
         closeButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        closeButton.setBounds(1849, 10, 50, 30); // Posición y tamaño del botón
         closeButton.addActionListener(e -> System.exit(0));
-
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        topPanel.setOpaque(false);
-        topPanel.add(closeButton);
-
-        panel.add(topPanel, BorderLayout.NORTH);
-
+        panel.add(closeButton);
+    
+        // Botón "Juegos"
+        JButton juegosButton = new JButton("JUGAR FACIL");
+        juegosButton.setFont(new Font("Monospaced", Font.BOLD, 30));
+        juegosButton.setBounds(840, 500, 240, 60); // Posición y tamaño del botón
+        juegosButton.setBackground(naranjaOscuro);
+        juegosButton.setForeground(Color.black);
+        panel.add(juegosButton);
+    
+        frame.setSize(400, 400);
+        frame.setLayout(null);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
+    
+        juegosButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new JuegoAhorcadoFACIL(); // Abrir la ventana del juego
+            }
+        });
+    
+        // Botón "Instrucciones"
+        JButton instruccionesButton = new JButton("Instrucciones");
+        instruccionesButton.setFont(new Font("Monospaced", Font.BOLD, 20));
+        instruccionesButton.setBounds(840, 600, 240, 60); // Posición y tamaño del botón
+        instruccionesButton.setBackground(naranjaOscuro);
+        instruccionesButton.setForeground(Color.black);
+        instruccionesButton.setFocusPainted(false);
+        panel.add(instruccionesButton);
+    
         frame.setContentPane(panel);
         frame.setVisible(true);
-
-    
-
-    
-
-
     }
 }
